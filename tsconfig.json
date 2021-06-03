@@ -13,6 +13,7 @@
     "downlevelIteration": true,
     "importHelpers": true,
     "resolveJsonModule": true,
+    "noImplicitOverride": true,
     "module": "esnext",
     "declaration": true,
     "outDir": "dist"
