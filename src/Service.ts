@@ -18,7 +18,7 @@ export type ConfirmOptions = {
      */
     yes?: string,
     /**
-     * Caption of the button to deny the confirmation.
+     * Caption of the button to deny the confirmation. If it is null, the button is not available.
      * @type {(string | null)}
      */
     no?: string | null,
