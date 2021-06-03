@@ -24,10 +24,10 @@ export type ConfirmOptions = {
     no?: string | null,
 };
 
-let globalAlert: AlertFunc;
-let globalConfirm: ConfirmFunc;
+let globalAlert: AlertFunc | null;
+let globalConfirm: ConfirmFunc | null;
 
-export const initAlerts = (alert: AlertFunc, confirm: ConfirmFunc): void => {
+export const initAlerts = (alert: AlertFunc | null, confirm: ConfirmFunc | null): void => {
     globalAlert = alert;
     globalConfirm = confirm;
 };
@@ -48,8 +48,8 @@ export const Alert = {
      * @param options The options for the confirmation.
      */
     confirm: (options: ConfirmOptions): Promise<void> => {
-        if (globalConfirm) {
-            return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
+            if (globalConfirm) {
                 globalConfirm(options.title, options.message, result => {
                     if (result) {
                         resolve();
@@ -57,9 +57,9 @@ export const Alert = {
                         reject();
                     }
                 }, options.yes, options.no);
-            });
-        }
+            }
 
-        return Promise.reject();
+            return Promise.reject();
+        });
     },
 };

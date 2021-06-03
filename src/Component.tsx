@@ -58,8 +58,12 @@ export class Alerts extends React.Component<Props, State> {
         };
     }
 
-    componentDidMount(): void {
+    override componentDidMount(): void {
         Service.initAlerts(this.showAlert, this.showConfirm);
+    }
+
+    override componentWillUnmount(): void {
+        Service.initAlerts(null, null);
     }
 
     showAlert = (message: string, severity: Service.AlertSeverity): void => {
@@ -93,7 +97,7 @@ export class Alerts extends React.Component<Props, State> {
         this.setState({ confirmOpen: false });
     };
 
-    render(): React.ReactNode {
+    override render(): React.ReactNode {
         const { alertOpen, alertSeverity, alertMessage, confirmOpen, confirmTitle, confirmMessage, confirmYesCaption, confirmNoCaption } = this.state;
         const autoHideDuration = alertSeverity === "success" || alertSeverity === "info" ? 3000 : 10000;
 
