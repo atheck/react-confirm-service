@@ -32,7 +32,7 @@ export const initAlerts = (alert: AlertFunc | null, confirm: ConfirmFunc | null)
     globalConfirm = confirm;
 };
 
-export const Alert = {
+export const ConfirmService = {
     /**
      * Shows an alert.
      * @param message The message of the alert.

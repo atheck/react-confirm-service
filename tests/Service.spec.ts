@@ -1,4 +1,4 @@
-import { initAlerts, Alert, ConfirmOptions } from "../src/Service";
+import { initAlerts, ConfirmService, ConfirmOptions } from "../src/Service";
 
 describe("Service", () => {
     describe("alert", () => {
@@ -12,7 +12,7 @@ describe("Service", () => {
             const severity = "error";
 
             // act
-            Alert.alert(message, severity);
+            ConfirmService.alert(message, severity);
 
             // assert
             expect(mockAlert).toHaveBeenCalledTimes(1);
@@ -35,7 +35,7 @@ describe("Service", () => {
             };
 
             // act
-            Alert.confirm(options);
+            ConfirmService.confirm(options);
 
             // assert
             expect(mockConfirm).toHaveBeenCalledTimes(1);

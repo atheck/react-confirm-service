@@ -1,9 +1,9 @@
-import { Alert, ConfirmOptions } from "./Service";
+import { ConfirmService, ConfirmOptions } from "./Service";
 
-export { Alert };
+export { ConfirmService };
 export type { ConfirmOptions };
 
-import { Alerts, AlertRenderProps, ConfirmRenderProps } from "./Component";
+import { ConfirmComponentHost, AlertRenderProps, ConfirmRenderProps } from "./Component";
 
-export { Alerts };
+export { ConfirmComponentHost };
 export type { AlertRenderProps, ConfirmRenderProps };

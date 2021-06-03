@@ -2,30 +2,34 @@ import * as Service from "./Service";
 import React, { Fragment } from "react";
 
 type State = {
-    alertOpen: boolean,
-    alertSeverity: Service.AlertSeverity,
-    alertMessage: string,
-    confirmOpen: boolean,
-    confirmTitle: string | undefined,
-    confirmMessage: string,
-    confirmYesCaption: string,
-    confirmNoCaption: string,
-    confirmCallback: (result: boolean) => void,
+    alert: {
+        isOpen: boolean,
+        severity: Service.AlertSeverity,
+        message: string,
+
+    },
+    confirm: {
+        isOpen: boolean,
+        title: string | undefined,
+        message: string,
+        yesCaption: string,
+        noCaption: string,
+        callback: (result: boolean) => void,
+    },
 };
 
 export type AlertRenderProps = {
-    open: boolean,
-    onClose: () => void,
+    isVisible: boolean,
+    message: string,
     duration: number,
     severity: Service.AlertSeverity,
-    message: string,
+    onClose: () => void,
 };
 
 export type ConfirmRenderProps = {
-    open: boolean,
+    isOpen: boolean,
     title?: string,
     message: string,
-    onClose: () => void,
     confirmCaption: string,
     onConfirm: () => void,
     denyCaption: string,
@@ -41,20 +45,24 @@ export type Props = {
     },
 };
 
-export class Alerts extends React.Component<Props, State> {
+export class ConfirmComponentHost extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
         this.state = {
-            alertOpen: false,
-            alertSeverity: "info",
-            alertMessage: "",
-            confirmOpen: false,
-            confirmTitle: undefined,
-            confirmMessage: "",
-            confirmYesCaption: "",
-            confirmNoCaption: "",
-            confirmCallback: () => undefined,
+            alert: {
+                isOpen: false,
+                severity: "info",
+                message: "",
+            },
+            confirm: {
+                isOpen: false,
+                title: undefined,
+                message: "",
+                yesCaption: "",
+                noCaption: "",
+                callback: () => undefined,
+            }
         };
     }
 
@@ -67,57 +75,78 @@ export class Alerts extends React.Component<Props, State> {
     }
 
     showAlert = (message: string, severity: Service.AlertSeverity): void => {
-        this.setState({ alertOpen: true, alertMessage: message, alertSeverity: severity });
+        this.setState({
+            alert: {
+                isOpen: true,
+                message,
+                severity,
+            },
+        });
     };
 
     showConfirm = (title: string | undefined, message: string, callback: (result: boolean) => void, yes?: string, no?: string | null): void => {
         const { strings } = this.props;
 
         this.setState({
-            confirmOpen: true,
-            confirmTitle: title,
-            confirmMessage: message,
-            confirmYesCaption: yes ?? strings?.yes ?? "Yes",
-            confirmNoCaption: no === undefined ? (strings?.no ?? "No") : no ?? "",
-            confirmCallback: callback,
+            confirm: {
+                isOpen: true,
+                title,
+                message,
+                yesCaption: yes ?? strings?.yes ?? "Yes",
+                noCaption: no === undefined ? (strings?.no ?? "No") : no ?? "",
+                callback,
+            },
         });
     };
 
     private readonly hideAlert = () => {
-        this.setState({ alertOpen: false });
+        this.setState(prev => ({
+            alert: {
+                ...prev.alert,
+                isOpen: false,
+            },
+        }));
     };
 
     private readonly acceptConfirm = () => {
-        this.state.confirmCallback(true);
-        this.setState({ confirmOpen: false });
+        this.state.confirm.callback(true);
+        this.closeConfirmation();
     };
 
     private readonly denyConfirm = () => {
-        this.state.confirmCallback(false);
-        this.setState({ confirmOpen: false });
+        this.state.confirm.callback(false);
+        this.closeConfirmation();
     };
 
+    private readonly closeConfirmation = () => {
+        this.setState(prev => ({
+            confirm: {
+                ...prev.confirm,
+                isOpen: false
+            },
+        }));
+    }
+
     override render(): React.ReactNode {
-        const { alertOpen, alertSeverity, alertMessage, confirmOpen, confirmTitle, confirmMessage, confirmYesCaption, confirmNoCaption } = this.state;
-        const autoHideDuration = alertSeverity === "success" || alertSeverity === "info" ? 3000 : 10000;
+        const { alert, confirm } = this.state;
+        const autoHideDuration = alert.severity === "success" || alert.severity === "info" ? 3000 : 10000;
 
         return (
             <Fragment>
                 {this.props.renderAlert({
-                    open: alertOpen,
+                    isVisible: alert.isOpen,
                     onClose: this.hideAlert,
                     duration: autoHideDuration,
-                    severity: alertSeverity,
-                    message: alertMessage,
+                    severity: alert.severity,
+                    message: alert.message,
                 })}
                 {this.props.renderConfirm({
-                    open: confirmOpen,
-                    title: confirmTitle,
-                    message: confirmMessage,
-                    onClose: this.denyConfirm,
-                    confirmCaption: confirmYesCaption,
+                    isOpen: confirm.isOpen,
+                    title: confirm.title,
+                    message: confirm.message,
+                    confirmCaption: confirm.yesCaption,
                     onConfirm: this.acceptConfirm,
-                    denyCaption: confirmNoCaption,
+                    denyCaption: confirm.noCaption,
                     onDeny: this.denyConfirm,
                 })}
             </Fragment>
