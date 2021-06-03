@@ -1,6 +1,6 @@
 {
   "name": "react-confirm-service",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Service to show alerts and confirmations in react apps",
   "author": "atheck",
   "license": "MIT",
