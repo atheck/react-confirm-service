@@ -63,7 +63,17 @@ ConfirmService.confirm({
 
 ## How to use the `ConfirmComponentHost`
 
-The `ConfirmComponentHost` takes the props `renderAlert`, and `renderConfirm`. Use these props to render the alert and confirm components.
+The `ConfirmComponentHost` the following props:
+
+| Property | Description |
+| --- | --- |
+| renderAlert | Required. Provide a function which renders the alert component. See [renderAlert](#renderAlert) |
+| renderConfirm | Required. Provide a function which renders the confirmation component. See [renderConfirm](#renderConfirm) |
+| strings | Takes an object to provide default values for `yes` an `no` button captions. Use this to localize these texts. |
+
+ takes the props `renderAlert`, and `renderConfirm`. Use these props to render the alert and confirm components.
+
+### renderAlert
 
 `renderAlert` is a function with one parameter of type `AlertRenderProps`:
 
@@ -74,6 +84,8 @@ The `ConfirmComponentHost` takes the props `renderAlert`, and `renderConfirm`. U
 | duration | How long should the message be displayed, in ms. |
 | severity | The severity of the alert. Use different icons and/or colors. |
 | onClose | Call this function when the alert should close. |
+
+### renderConfirm
 
 `renderConfirm` is a function with one parameter of type `ConfirmRenderProps`:
 
