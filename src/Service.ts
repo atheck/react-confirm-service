@@ -57,9 +57,9 @@ export const ConfirmService = {
                         reject();
                     }
                 }, options.yes, options.no);
+            } else {
+                return reject();
             }
-
-            return Promise.reject();
         });
     },
 };
