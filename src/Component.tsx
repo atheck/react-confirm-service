@@ -75,13 +75,19 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
     }
 
     showAlert = (message: string, severity: Service.AlertSeverity): void => {
-        this.setState({
-            alert: {
-                isOpen: true,
-                message,
-                severity,
-            },
-        });
+        if (this.state.alert.isOpen) {
+            this.hideAlert();
+
+            setTimeout(() => this.showAlert(message, severity), 10);
+        } else {
+            this.setState({
+                alert: {
+                    isOpen: true,
+                    message,
+                    severity,
+                },
+            });
+        }
     };
 
     showConfirm = (title: string | undefined, message: string, callback: (result: boolean) => void, yes?: string, no?: string | null): void => {
