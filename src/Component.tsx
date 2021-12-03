@@ -1,7 +1,7 @@
 import * as Service from "./Service";
 import React, { Fragment } from "react";
 
-type State = {
+interface State {
     alert: {
         isOpen: boolean,
         severity: Service.AlertSeverity,
@@ -16,17 +16,17 @@ type State = {
         noCaption: string,
         callback: (result: boolean) => void,
     },
-};
+}
 
-export type AlertRenderProps = {
+export interface AlertRenderProps {
     isVisible: boolean,
     message: string,
     duration: number,
     severity: Service.AlertSeverity,
     onClose: () => void,
-};
+}
 
-export type ConfirmRenderProps = {
+export interface ConfirmRenderProps {
     isOpen: boolean,
     title?: string,
     message: string,
@@ -34,19 +34,19 @@ export type ConfirmRenderProps = {
     onConfirm: () => void,
     denyCaption: string,
     onDeny: () => void,
-};
+}
 
-export type Props = {
+export interface Props {
     renderAlert: (props: AlertRenderProps) => React.ReactElement,
     renderConfirm: (props: ConfirmRenderProps) => React.ReactElement,
     strings?: {
         yes?: string,
         no?: string,
     },
-};
+}
 
 export class ConfirmComponentHost extends React.Component<Props, State> {
-    constructor(props: Props) {
+    public constructor (props: Props) {
         super(props);
 
         this.state = {
@@ -61,21 +61,53 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
                 message: "",
                 yesCaption: "",
                 noCaption: "",
-                callback: () => undefined,
-            }
+                callback () {
+                    // blank
+                },
+            },
         };
     }
 
-    override componentDidMount(): void {
+    public override componentDidMount (): void {
         Service.initAlerts(this.showAlert, this.showConfirm);
     }
 
-    override componentWillUnmount(): void {
+    // eslint-disable-next-line class-methods-use-this
+    public override componentWillUnmount (): void {
         Service.initAlerts(null, null);
     }
 
-    showAlert = (message: string, severity: Service.AlertSeverity): void => {
-        if (this.state.alert.isOpen) {
+    public override render (): React.ReactNode {
+        const { alert, confirm } = this.state;
+        const { renderAlert, renderConfirm } = this.props;
+        const autoHideDuration = alert.severity === "success" || alert.severity === "info" ? 3_000 : 10_000;
+
+        return (
+            <Fragment>
+                {renderAlert({
+                    isVisible: alert.isOpen,
+                    onClose: this.hideAlert,
+                    duration: autoHideDuration,
+                    severity: alert.severity,
+                    message: alert.message,
+                })}
+                {renderConfirm({
+                    isOpen: confirm.isOpen,
+                    title: confirm.title,
+                    message: confirm.message,
+                    confirmCaption: confirm.yesCaption,
+                    onConfirm: this.acceptConfirm,
+                    denyCaption: confirm.noCaption,
+                    onDeny: this.denyConfirm,
+                })}
+            </Fragment>
+        );
+    }
+
+    private readonly showAlert = (message: string, severity: Service.AlertSeverity): void => {
+        const { alert } = this.state;
+
+        if (alert.isOpen) {
             this.hideAlert();
 
             setTimeout(() => this.showAlert(message, severity), 10);
@@ -90,7 +122,7 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
         }
     };
 
-    showConfirm = (title: string | undefined, message: string, callback: (result: boolean) => void, yes?: string, no?: string | null): void => {
+    private readonly showConfirm = (title: string | undefined, message: string, callback: (result: boolean) => void, yes?: string, no?: string | null): void => {
         const { strings } = this.props;
 
         this.setState({
@@ -99,13 +131,13 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
                 title,
                 message,
                 yesCaption: yes ?? strings?.yes ?? "Yes",
-                noCaption: no === undefined ? (strings?.no ?? "No") : no ?? "",
+                noCaption: no === undefined ? strings?.no ?? "No" : no ?? "",
                 callback,
             },
         });
     };
 
-    private readonly hideAlert = () => {
+    private readonly hideAlert = (): void => {
         this.setState(prev => ({
             alert: {
                 ...prev.alert,
@@ -114,48 +146,26 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
         }));
     };
 
-    private readonly acceptConfirm = () => {
-        this.state.confirm.callback(true);
+    private readonly acceptConfirm = (): void => {
+        const { confirm } = this.state;
+
+        confirm.callback(true);
         this.closeConfirmation();
     };
 
-    private readonly denyConfirm = () => {
-        this.state.confirm.callback(false);
+    private readonly denyConfirm = (): void => {
+        const { confirm } = this.state;
+
+        confirm.callback(false);
         this.closeConfirmation();
     };
 
-    private readonly closeConfirmation = () => {
+    private readonly closeConfirmation = (): void => {
         this.setState(prev => ({
             confirm: {
                 ...prev.confirm,
-                isOpen: false
+                isOpen: false,
             },
         }));
-    }
-
-    override render(): React.ReactNode {
-        const { alert, confirm } = this.state;
-        const autoHideDuration = alert.severity === "success" || alert.severity === "info" ? 3000 : 10000;
-
-        return (
-            <Fragment>
-                {this.props.renderAlert({
-                    isVisible: alert.isOpen,
-                    onClose: this.hideAlert,
-                    duration: autoHideDuration,
-                    severity: alert.severity,
-                    message: alert.message,
-                })}
-                {this.props.renderConfirm({
-                    isOpen: confirm.isOpen,
-                    title: confirm.title,
-                    message: confirm.message,
-                    confirmCaption: confirm.yesCaption,
-                    onConfirm: this.acceptConfirm,
-                    denyCaption: confirm.noCaption,
-                    onDeny: this.denyConfirm,
-                })}
-            </Fragment>
-        );
-    }
+    };
 }
