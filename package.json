@@ -14,6 +14,8 @@
     "@babel/preset-typescript": "7.16.0",
     "@types/jest": "27.0.3",
     "@types/react": "17.0.37",
+    "eslint": "8.3.0",
+    "eslint-config-heck": "1.1.2",
     "jest": "27.4.3",
     "ts-jest": "27.0.7",
     "tslib": "2.3.1",
@@ -24,10 +26,11 @@
   },
   "scripts": {
     "build": "npm run build:types && npm run build:js",
-    "build:types": "tsc --emitDeclarationOnly",
+    "build:types": "tsc --emitDeclarationOnly --project ./src",
     "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "lint": "npx eslint --ext .ts,.tsx ./src"
   },
   "homepage": "https://github.com/atheck/react-confirm-service",
   "repository": {
