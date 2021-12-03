@@ -38,7 +38,7 @@ export const ConfirmService = {
      * @param message The message of the alert.
      * @param severity The severity of the alert.
      */
-    alert (message: string, severity: AlertSeverity): void {
+    alert (this: void, message: string, severity: AlertSeverity): void {
         if (globalAlert) {
             globalAlert(message, severity);
         }
@@ -47,7 +47,7 @@ export const ConfirmService = {
      * Shows a confirmation.
      * @param options The options for the confirmation.
      */
-    async confirm (options: ConfirmOptions): Promise<void> {
+    async confirm (this: void, options: ConfirmOptions): Promise<void> {
         return new Promise((resolve, reject) => {
             if (globalConfirm) {
                 globalConfirm(options.title, options.message, result => {
