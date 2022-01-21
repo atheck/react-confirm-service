@@ -3,7 +3,7 @@
 ![Build](https://github.com/atheck/react-confirm-service/actions/workflows/main.yml/badge.svg)
 ![npm](https://img.shields.io/npm/v/react-confirm-service)
 
-Provides a service to show alerts and confirmations in react apps.
+Provides a service to show alerts, confirmations, and choices in react apps.
 
 ## Installation
 
@@ -37,11 +37,26 @@ import { ConfirmComponentHost } from "react-confirm-service";
                 // render content, buttons, ...
             </Dialog>
         )}
+        renderChoice={props => {
+            const options = props.options.map(option => <li key={option.key} onClick={() => props.onConfirm(option)}>{option.key}</li>);
+
+            <Dialog
+                isOpen={props.isOpen}
+                title={props.title}
+            >
+                <>
+                    <ul>
+                        {options}
+                    </ul>
+                    <button onClick={props.onCancel}>Cancel</button>
+                </>
+            </Dialog>
+        )}
     />
 </MyApp>
 ~~~
 
-The implementation depends on the UI components you want to use to show alerts and confirmation dialogs.
+The implementation depends on the UI components you want to use to show alerts, confirmation, and choice dialogs.
 
 After that, you can use the `ConfirmService` anywhere in your application:
 
@@ -59,19 +74,31 @@ ConfirmService.confirm({
 })
     .then(/* Yes */)
     .catch(/* No */);
+
+...
+
+ConfirmService.choose({
+    title: "Fruits",
+    options: [
+        { key: "Bananas" },
+        { key: "Apples" },
+        { key: "Pineapples" },
+    ]
+})
+    .then(choice => /* ... */)
+    .catch(/* cancelled */)
 ~~~
 
 ## How to use the `ConfirmComponentHost`
 
-The `ConfirmComponentHost` the following props:
+The `ConfirmComponentHost` accepts the following props:
 
 | Property | Description |
 | --- | --- |
 | renderAlert | Required. Provide a function which renders the alert component. See [renderAlert](#renderAlert) |
 | renderConfirm | Required. Provide a function which renders the confirmation component. See [renderConfirm](#renderConfirm) |
-| strings | Takes an object to provide default values for `yes` an `no` button captions. Use this to localize these texts. |
-
- takes the props `renderAlert`, and `renderConfirm`. Use these props to render the alert and confirm components.
+| renderChoice | Optional. Provide a function which renders the choice component. See [renderChoice](#renderChoice) |
+| strings | Takes an object to provide default values for `yes`, `no`, and `cancel` button captions. Use this to localize these texts. |
 
 ### renderAlert
 
@@ -99,6 +126,17 @@ The `ConfirmComponentHost` the following props:
 | denyCaption | The caption of the button to deny the confirmation. Do not display this button if the caption is an empty string (""). |
 | onDeny | Call this function when the button to deny is pressed. |
 
+### renderChoice
+
+`renderChoice` is a function with one parameter of type `ChoiceRenderProps`:
+
+| Property | Description |
+| --- | --- |
+| isOpen | Is the choice dialog opened? |
+| title | The optional title of the choice. |
+| onConfirm | Call this function when a choice is selected. |
+| onCancel | Call this function when the choice is cancelled. |
+
 ## How to use the `ConfirmService`
 
 ### Alert
@@ -122,3 +160,14 @@ To show a confirmation to the user, use the `confirm` function. It takes one opt
 | no | The caption of the button to deny. The default is "No". If you pass `null`, the button is not displayed. |
 
 This function returns a `Promise`. It will be resolved if the confirmation is accepted and rejected if the confirmation is denied.
+
+### Choose
+
+To show a choice to the user, use the `choose` function. It takes one options parameter:
+
+| Property | Description |
+| --- | --- |
+| title | The optional title of the choice. |
+| options | The possible choices. |
+
+This function returns a `Promise`. It will be resolved with the selected option and rejected if the choice is cancelled.

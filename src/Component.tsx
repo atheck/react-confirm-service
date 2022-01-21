@@ -16,6 +16,13 @@ interface State {
         noCaption: string,
         callback: (result: boolean) => void,
     },
+    choice: {
+        isOpen: boolean,
+        title: string | undefined,
+        options: Service.Option [],
+        renderOption?: (option: Service.Option) => React.ReactElement,
+        callback: (result: Service.Option | null) => void,
+    },
 }
 
 export interface AlertRenderProps {
@@ -36,12 +43,23 @@ export interface ConfirmRenderProps {
     onDeny: () => void,
 }
 
+export interface ChoiceRenderProps {
+    isOpen: boolean,
+    title?: string,
+    options: Service.Option [],
+    renderOption?: (option: Service.Option) => React.ReactElement,
+    onConfirm: (option: Service.Option) => void,
+    onCancel: () => void,
+}
+
 export interface Props {
     renderAlert: (props: AlertRenderProps) => React.ReactElement,
     renderConfirm: (props: ConfirmRenderProps) => React.ReactElement,
+    renderChoice?: (props: ChoiceRenderProps) => React.ReactElement,
     strings?: {
         yes?: string,
         no?: string,
+        cancel?: string,
     },
 }
 
@@ -65,21 +83,30 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
                     // blank
                 },
             },
+            choice: {
+                isOpen: false,
+                title: undefined,
+                options: [],
+                renderOption: undefined,
+                callback () {
+                    // blank
+                },
+            },
         };
     }
 
     public override componentDidMount (): void {
-        Service.initAlerts(this.showAlert, this.showConfirm);
+        Service.initAlerts(this.showAlert, this.showConfirm, this.showChoice);
     }
 
     // eslint-disable-next-line class-methods-use-this
     public override componentWillUnmount (): void {
-        Service.initAlerts(null, null);
+        Service.initAlerts(null, null, null);
     }
 
     public override render (): React.ReactNode {
-        const { alert, confirm } = this.state;
-        const { renderAlert, renderConfirm } = this.props;
+        const { alert, confirm, choice } = this.state;
+        const { renderAlert, renderConfirm, renderChoice } = this.props;
         const autoHideDuration = alert.severity === "success" || alert.severity === "info" ? 3_000 : 10_000;
 
         return (
@@ -99,6 +126,13 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
                     onConfirm: this.acceptConfirm,
                     denyCaption: confirm.noCaption,
                     onDeny: this.denyConfirm,
+                })}
+                {renderChoice?.({
+                    isOpen: choice.isOpen,
+                    title: choice.title,
+                    options: choice.options,
+                    onConfirm: this.confirmChoice,
+                    onCancel: this.cancelChoice,
                 })}
             </Fragment>
         );
@@ -164,6 +198,43 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
         this.setState(prev => ({
             confirm: {
                 ...prev.confirm,
+                isOpen: false,
+            },
+        }));
+    };
+
+    private readonly showChoice = (props: Service.ChooseOptions, callback: (option: Service.Option | null) => void): void => {
+        this.setState({
+            choice: {
+                isOpen: true,
+                title: props.title,
+                options: props.options,
+                callback,
+            },
+        });
+    };
+
+    private readonly confirmChoice = (option: Service.Option): void => {
+        const { choice } = this.state;
+
+        choice.callback(option);
+
+        this.setState(prev => ({
+            choice: {
+                ...prev.choice,
+                isOpen: false,
+            },
+        }));
+    };
+
+    private readonly cancelChoice = (): void => {
+        const { choice } = this.state;
+
+        choice.callback(null);
+
+        this.setState(prev => ({
+            choice: {
+                ...prev.choice,
                 isOpen: false,
             },
         }));
