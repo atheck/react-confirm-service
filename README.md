@@ -134,6 +134,8 @@ The `ConfirmComponentHost` accepts the following props:
 | --- | --- |
 | isOpen | Is the choice dialog opened? |
 | title | The optional title of the choice. |
+| options | The list of selectable options to show. |
+| cancelCaption | The caption of the action to cancel the choice. |
 | onConfirm | Call this function when a choice is selected. |
 | onCancel | Call this function when the choice is cancelled. |
 
@@ -156,8 +158,8 @@ To show a confirmation to the user, use the `confirm` function. It takes one opt
 | --- | --- |
 | title | The optional title of the confirmation. |
 | message | The message of the confirmation. |
-| yes | The caption of the button to accept. The default is "Yes". |
-| no | The caption of the button to deny. The default is "No". If you pass `null`, the button is not displayed. |
+| yes | The caption of the button to accept. If not provided the `yes` property of `strings` is used. The default is "Yes". |
+| no | The caption of the button to deny. If not provided the `no` property of `strings` is used. The default is "No". If you pass `null`, the button is not displayed. |
 
 This function returns a `Promise`. It will be resolved if the confirmation is accepted and rejected if the confirmation is denied.
 
@@ -169,5 +171,6 @@ To show a choice to the user, use the `choose` function. It takes one options pa
 | --- | --- |
 | title | The optional title of the choice. |
 | options | The possible choices. |
+| cancelCaption | The optional caption of the cancel action. If not provided the `cancel` property of `strings` is used. The default is "Cancel". |
 
 This function returns a `Promise`. It will be resolved with the selected option and rejected if the choice is cancelled.

@@ -20,7 +20,7 @@ interface State {
         isOpen: boolean,
         title: string | undefined,
         options: Service.Option [],
-        renderOption?: (option: Service.Option) => React.ReactElement,
+        cancelCaption: string,
         callback: (result: Service.Option | null) => void,
     },
 }
@@ -47,7 +47,7 @@ export interface ChoiceRenderProps {
     isOpen: boolean,
     title?: string,
     options: Service.Option [],
-    renderOption?: (option: Service.Option) => React.ReactElement,
+    cancelCaption: string,
     onConfirm: (option: Service.Option) => void,
     onCancel: () => void,
 }
@@ -87,7 +87,7 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
                 isOpen: false,
                 title: undefined,
                 options: [],
-                renderOption: undefined,
+                cancelCaption: "",
                 callback () {
                     // blank
                 },
@@ -119,18 +119,14 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
                     message: alert.message,
                 })}
                 {renderConfirm({
-                    isOpen: confirm.isOpen,
-                    title: confirm.title,
-                    message: confirm.message,
+                    ...confirm,
                     confirmCaption: confirm.yesCaption,
                     onConfirm: this.acceptConfirm,
                     denyCaption: confirm.noCaption,
                     onDeny: this.denyConfirm,
                 })}
                 {renderChoice?.({
-                    isOpen: choice.isOpen,
-                    title: choice.title,
-                    options: choice.options,
+                    ...choice,
                     onConfirm: this.confirmChoice,
                     onCancel: this.cancelChoice,
                 })}
@@ -204,11 +200,14 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
     };
 
     private readonly showChoice = (props: Service.ChooseOptions, callback: (option: Service.Option | null) => void): void => {
+        const { strings } = this.props;
+
         this.setState({
             choice: {
                 isOpen: true,
                 title: props.title,
                 options: props.options,
+                cancelCaption: props.cancelCaption ?? strings?.cancel ?? "Cancel",
                 callback,
             },
         });

@@ -40,6 +40,10 @@ export interface ChooseOptions {
      * The list of selectable options.
      */
     options: Option [],
+    /**
+     * The optional caption of the cancel action.
+     */
+    cancelCaption?: string,
 }
 
 let globalAlert: AlertFunc | null;
