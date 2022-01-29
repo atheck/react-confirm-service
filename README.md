@@ -93,12 +93,13 @@ ConfirmService.choose({
 
 The `ConfirmComponentHost` accepts the following props:
 
-| Property | Description |
-| --- | --- |
-| renderAlert | Required. Provide a function which renders the alert component. See [renderAlert](#renderAlert) |
-| renderConfirm | Required. Provide a function which renders the confirmation component. See [renderConfirm](#renderConfirm) |
-| renderChoice | Optional. Provide a function which renders the choice component. See [renderChoice](#renderChoice) |
-| strings | Takes an object to provide default values for `yes`, `no`, and `cancel` button captions. Use this to localize these texts. |
+| Property | Required | Description |
+| --- | --- | --- |
+| renderAlert | yes | Provide a function which renders the alert component. See [renderAlert](#renderAlert) |
+| renderConfirm | yes | Provide a function which renders the confirmation component. See [renderConfirm](#renderConfirm) |
+| renderChoice | no | Provide a function which renders the choice component. See [renderChoice](#renderChoice) |
+| strings | no | Takes an object to provide default values for `yes`, `no`, and `cancel` button captions. Use this to localize these texts. |
+| alertDurations | no | You can provide an object to set the durations of an alert for each severity in ms. The defaults are: info: 3000, success: 3000, warning: 10000, error: 10000. |
 
 ### renderAlert
 
@@ -145,21 +146,21 @@ The `ConfirmComponentHost` accepts the following props:
 
 To show an alert to the user, call the `alert` function. It has the following parameters:
 
-| Parameter | Description |
-| --- | ---
-| message | The message to display. |
-| severity | The severity of the alert. |
+| Parameter | Required | Description |
+| --- | --- | --- |
+| message | yes | The message to display. |
+| severity | yes | The severity of the alert. |
 
 ### Confirm
 
 To show a confirmation to the user, use the `confirm` function. It takes one options parameter:
 
-| Property | Description |
-| --- | --- |
-| title | The optional title of the confirmation. |
-| message | The message of the confirmation. |
-| yes | The caption of the button to accept. If not provided the `yes` property of `strings` is used. The default is "Yes". |
-| no | The caption of the button to deny. If not provided the `no` property of `strings` is used. The default is "No". If you pass `null`, the button is not displayed. |
+| Property | Required | Description |
+| --- | --- | --- |
+| title | no | The title of the confirmation. |
+| message | yes | The message of the confirmation. |
+| yes | no | The caption of the button to accept. If not provided the `yes` property of `strings` is used. The default is "Yes". |
+| no | no | The caption of the button to deny. If not provided the `no` property of `strings` is used. The default is "No". If you pass `null`, the button is not displayed. |
 
 This function returns a `Promise`. It will be resolved if the confirmation is accepted and rejected if the confirmation is denied.
 
@@ -167,10 +168,10 @@ This function returns a `Promise`. It will be resolved if the confirmation is ac
 
 To show a choice to the user, use the `choose` function. It takes one options parameter:
 
-| Property | Description |
-| --- | --- |
-| title | The optional title of the choice. |
-| options | The possible choices. |
-| cancelCaption | The optional caption of the cancel action. If not provided the `cancel` property of `strings` is used. The default is "Cancel". |
+| Property | Required | Description |
+| --- | --- | --- |
+| title | no | The title of the choice. |
+| options | yes | The possible choices. |
+| cancelCaption | no | The caption of the cancel action. If not provided the `cancel` property of `strings` is used. The default is "Cancel". |
 
 This function returns a `Promise`. It will be resolved with the selected option and rejected if the choice is cancelled.

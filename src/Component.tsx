@@ -52,6 +52,8 @@ export interface ChoiceRenderProps {
     onCancel: () => void,
 }
 
+type AlertDurations = Record<Service.AlertSeverity, number>;
+
 export interface Props {
     renderAlert: (props: AlertRenderProps) => React.ReactElement,
     renderConfirm: (props: ConfirmRenderProps) => React.ReactElement,
@@ -61,7 +63,15 @@ export interface Props {
         no?: string,
         cancel?: string,
     },
+    alertDurations?: AlertDurations,
 }
+
+const defaultDurations: AlertDurations = {
+    info: 3_000,
+    success: 3_000,
+    warning: 10_000,
+    error: 10_000,
+};
 
 export class ConfirmComponentHost extends React.Component<Props, State> {
     public constructor (props: Props) {
@@ -106,8 +116,8 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
 
     public override render (): React.ReactNode {
         const { alert, confirm, choice } = this.state;
-        const { renderAlert, renderConfirm, renderChoice } = this.props;
-        const autoHideDuration = alert.severity === "success" || alert.severity === "info" ? 3_000 : 10_000;
+        const { renderAlert, renderConfirm, renderChoice, alertDurations } = this.props;
+        const autoHideDuration = alertDurations?.[alert.severity] ?? defaultDurations[alert.severity];
 
         return (
             <Fragment>
