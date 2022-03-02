@@ -1,5 +1,5 @@
 import { AlertRenderProps, ConfirmComponentHost, ConfirmRenderProps } from "./Component";
-import { ConfirmOptions, ConfirmService } from "./Service";
+import { ConfirmOptions, ConfirmService, Option } from "./Service";
 
 export {
     ConfirmService,
@@ -9,4 +9,5 @@ export type {
     ConfirmOptions,
     AlertRenderProps,
     ConfirmRenderProps,
+    Option,
 };
