@@ -11,7 +11,7 @@ describe("Service", () => {
         mockChoose.mockReset();
 
         initAlerts(mockAlert, mockConfirm, mockChoose);
-    })
+    });
 
     describe("alert", () => {
         it("calls the provided alert function", () => {
@@ -31,7 +31,7 @@ describe("Service", () => {
             initAlerts(null, mockConfirm, mockChoose);
 
             // act
-            const fails = () => ConfirmService.alert("Message", "info");
+            const fails = (): void => ConfirmService.alert("Message", "info");
 
             // assert
             expect(fails).toThrow("ConfirmService is not initialized.");
