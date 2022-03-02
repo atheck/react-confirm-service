@@ -30,7 +30,7 @@ export interface Option {
     key: string | number,
 }
 
-export interface ChooseOptions {
+export interface ChooseOptions<TData extends Option = Option> {
     /**
      * The title of the choice.
      * @type {string}
@@ -39,7 +39,7 @@ export interface ChooseOptions {
     /**
      * The list of selectable options.
      */
-    options: Option [],
+    options: TData [],
     /**
      * The optional caption of the cancel action.
      */
@@ -94,12 +94,12 @@ export const ConfirmService = {
      * @param options The options of the choice.
      * @returns Resolves if a choice was selected, otherwise rejects the promise.
      */
-    async choose (this: void, options: ChooseOptions): Promise<Option> {
-        return new Promise((resolve, reject) => {
+    async choose<TData extends Option> (this: void, options: ChooseOptions<TData>): Promise<TData> {
+        return new Promise<TData>((resolve, reject) => {
             if (globalChoose) {
-                globalChoose(options, result => {
+                globalChoose(options as ChooseOptions, result => {
                     if (result) {
-                        resolve(result);
+                        resolve(result as TData);
                     } else {
                         reject(new Error("Canceled"));
                     }

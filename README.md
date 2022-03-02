@@ -175,3 +175,22 @@ To show a choice to the user, use the `choose` function. It takes one options pa
 | cancelCaption | no | The caption of the cancel action. If not provided the `cancel` property of `strings` is used. The default is "Cancel". |
 
 This function returns a `Promise`. It will be resolved with the selected option and rejected if the choice is cancelled.
+
+The `choose` function is a generic function. So you can provide a custom type for your options. The generic parameter is optional.
+
+Your custom type must have a `key` property of type `string | number`.
+
+~~~ts
+interface CustomOption {
+    key: string | number,
+    data: MyData,
+}
+
+ConfirmService.choose<CustomOption>({
+    options: [
+        { key: "1", data: myData1 },
+        { key: "2", data: myData2 },
+        { key: "3", data: myData3 }
+    ]
+});
+~~~
