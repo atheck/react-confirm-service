@@ -25,7 +25,7 @@ interface State {
     },
 }
 
-export interface AlertRenderProps {
+interface AlertRenderProps {
     isVisible: boolean,
     message: string,
     duration: number,
@@ -33,7 +33,7 @@ export interface AlertRenderProps {
     onClose: () => void,
 }
 
-export interface ConfirmRenderProps {
+interface ConfirmRenderProps {
     isOpen: boolean,
     title?: string,
     message: string,
@@ -43,7 +43,7 @@ export interface ConfirmRenderProps {
     onDeny: () => void,
 }
 
-export interface ChoiceRenderProps {
+interface ChoiceRenderProps {
     isOpen: boolean,
     title?: string,
     options: Service.Option [],
@@ -54,7 +54,7 @@ export interface ChoiceRenderProps {
 
 type AlertDurations = Record<Service.AlertSeverity, number>;
 
-export interface Props {
+interface Props {
     renderAlert: (props: AlertRenderProps) => React.ReactElement,
     renderConfirm: (props: ConfirmRenderProps) => React.ReactElement,
     renderChoice?: (props: ChoiceRenderProps) => React.ReactElement,
@@ -73,7 +73,7 @@ const defaultDurations: AlertDurations = {
     error: 10_000,
 };
 
-export class ConfirmComponentHost extends React.Component<Props, State> {
+class ConfirmComponentHost extends React.Component<Props, State> {
     public constructor (props: Props) {
         super(props);
 
@@ -249,3 +249,14 @@ export class ConfirmComponentHost extends React.Component<Props, State> {
         }));
     };
 }
+
+export type {
+    AlertRenderProps,
+    ConfirmRenderProps,
+    ChoiceRenderProps,
+    Props,
+};
+
+export {
+    ConfirmComponentHost,
+};

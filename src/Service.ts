@@ -1,9 +1,9 @@
-export type AlertSeverity = "error" | "warning" | "info" | "success";
-export type AlertFunc = (message: string, severity: AlertSeverity) => void;
-export type ConfirmFunc = (title: string | undefined, message: string, callback: (result: boolean) => void, yes?: string, no?: string | null) => void;
-export type ChooseFunc = (props: ChooseOptions, callback: (result: Option | null) => void) => void;
+type AlertSeverity = "error" | "warning" | "info" | "success";
+type AlertFunc = (message: string, severity: AlertSeverity) => void;
+type ConfirmFunc = (title: string | undefined, message: string, callback: (result: boolean) => void, yes?: string, no?: string | null) => void;
+type ChooseFunc = (props: ChooseOptions, callback: (result: Option | null) => void) => void;
 
-export interface ConfirmOptions {
+interface ConfirmOptions {
     /**
      * The title of the confirmation.
      * @type {string}
@@ -26,11 +26,11 @@ export interface ConfirmOptions {
     no?: string | null,
 }
 
-export interface Option {
+interface Option {
     key: string | number,
 }
 
-export interface ChooseOptions<TData extends Option = Option> {
+interface ChooseOptions<TData extends Option = Option> {
     /**
      * The title of the choice.
      * @type {string}
@@ -50,13 +50,13 @@ let globalAlert: AlertFunc | null;
 let globalConfirm: ConfirmFunc | null;
 let globalChoose: ChooseFunc | null;
 
-export function initAlerts (alert: AlertFunc | null, confirm: ConfirmFunc | null, choose: ChooseFunc | null): void {
+function initAlerts (alert: AlertFunc | null, confirm: ConfirmFunc | null, choose: ChooseFunc | null): void {
     globalAlert = alert;
     globalConfirm = confirm;
     globalChoose = choose;
 }
 
-export const ConfirmService = {
+const ConfirmService = {
     /**
      * Shows an alert.
      * @param message The message of the alert.
@@ -109,4 +109,19 @@ export const ConfirmService = {
             }
         });
     },
+};
+
+export type {
+    AlertSeverity,
+    AlertFunc,
+    ConfirmFunc,
+    ChooseFunc,
+    ConfirmOptions,
+    Option,
+    ChooseOptions,
+};
+
+export {
+    initAlerts,
+    ConfirmService,
 };
