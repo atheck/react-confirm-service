@@ -110,7 +110,8 @@ describe("Service", () => {
         it("calls the provided choose function", async () => {
             // arrange
             mockChoose.mockImplementation((_options: ChooseOptions, callback: (option: Option | null) => void): void => {
-                callback(options[1]);
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                callback(options[1]!);
             });
 
             const chooseOptions: ChooseOptions = {

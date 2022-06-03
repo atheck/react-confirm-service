@@ -8,6 +8,7 @@
     "lib": ["ESNext", "DOM"],
     "moduleResolution": "node",
     "strict": true,
+    "noUncheckedIndexedAccess": true,
     "target": "esnext",
     "strictNullChecks": true,
     "downlevelIteration": true,
