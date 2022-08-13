@@ -162,7 +162,7 @@ class ConfirmComponentHost extends React.Component<Props, State> {
         }
     };
 
-    private readonly showConfirm = (title: string | undefined, message: string, callback: (result: boolean) => void, yes?: string, no?: string | null): void => {
+    private readonly showConfirm = ({ title, message, yes, no }: Service.ConfirmOptions, callback: (result: boolean) => void): void => {
         const { strings } = this.props;
 
         this.setState({

@@ -1,6 +1,6 @@
 type AlertSeverity = "error" | "warning" | "info" | "success";
 type AlertFunc = (message: string, severity: AlertSeverity) => void;
-type ConfirmFunc = (title: string | undefined, message: string, callback: (result: boolean) => void, yes?: string, no?: string | null) => void;
+type ConfirmFunc = (options: ConfirmOptions, callback: (result: boolean) => void) => void;
 type ChooseFunc = (props: ChooseOptions, callback: (result: Option | null) => void) => void;
 
 interface ConfirmOptions {
@@ -76,13 +76,13 @@ const ConfirmService = {
     async confirm (this: void, options: ConfirmOptions): Promise<void> {
         return new Promise((resolve, reject) => {
             if (globalConfirm) {
-                globalConfirm(options.title, options.message, result => {
+                globalConfirm(options, result => {
                     if (result) {
                         resolve();
                     } else {
                         reject(new Error("Canceled"));
                     }
-                }, options.yes, options.no);
+                });
             } else {
                 reject(new Error("ConfirmService is not initialized."));
             }
@@ -113,9 +113,6 @@ const ConfirmService = {
 
 export type {
     AlertSeverity,
-    AlertFunc,
-    ConfirmFunc,
-    ChooseFunc,
     ConfirmOptions,
     Option,
     ChooseOptions,

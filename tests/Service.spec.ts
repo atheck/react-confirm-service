@@ -41,7 +41,7 @@ describe("Service", () => {
     describe("confirm", () => {
         it("calls the provided confirm function", async () => {
             // arrange
-            mockConfirm.mockImplementation((_title: string | undefined, _message: string, callback: (result: boolean) => void): void => {
+            mockConfirm.mockImplementation((_options, callback: (result: boolean) => void): void => {
                 callback(true);
             });
 
@@ -56,12 +56,12 @@ describe("Service", () => {
             await ConfirmService.confirm(options);
 
             // assert
-            expect(mockConfirm).toHaveBeenCalledWith(options.title, options.message, expect.any(Function), "yes", "no");
+            expect(mockConfirm).toHaveBeenCalledWith(options, expect.any(Function));
         });
 
         it("throws if confirmation was canceled", async () => {
             // arrange
-            mockConfirm.mockImplementation((_title: string | undefined, _message: string, callback: (result: boolean) => void): void => {
+            mockConfirm.mockImplementation((_options, callback: (result: boolean) => void): void => {
                 callback(false);
             });
 
@@ -77,7 +77,7 @@ describe("Service", () => {
 
             // assert
             await expect(fails).rejects.toThrow("Canceled");
-            expect(mockConfirm).toHaveBeenCalledWith(options.title, options.message, expect.any(Function), "yes", "no");
+            expect(mockConfirm).toHaveBeenCalledWith(options, expect.any(Function));
         });
 
         it("throws if not initialized", async () => {
