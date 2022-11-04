@@ -95,9 +95,9 @@ The `ConfirmComponentHost` accepts the following props:
 
 | Property | Required | Description |
 | --- | --- | --- |
-| renderAlert | yes | Provide a function which renders the alert component. See [renderAlert](#renderAlert) |
-| renderConfirm | yes | Provide a function which renders the confirmation component. See [renderConfirm](#renderConfirm) |
-| renderChoice | no | Provide a function which renders the choice component. See [renderChoice](#renderChoice) |
+| renderAlert | yes | Provide a function which renders the alert component. See [renderAlert](#renderalert) |
+| renderConfirm | yes | Provide a function which renders the confirmation component. See [renderConfirm](#renderconfirm) |
+| renderChoice | no | Provide a function which renders the choice component. See [renderChoice](#renderchoice) |
 | strings | no | Takes an object to provide default values for `yes`, `no`, and `cancel` button captions. Use this to localize these texts. |
 | alertDurations | no | You can provide an object to set the durations of an alert for each severity in ms. The defaults are: info: 3000, success: 3000, warning: 10000, error: 10000. |
 
@@ -136,6 +136,7 @@ The `ConfirmComponentHost` accepts the following props:
 | isOpen | Is the choice dialog opened? |
 | title | The optional title of the choice. |
 | options | The list of selectable options to show. |
+| type | The optional type of the options to distinguish when rendering. |
 | cancelCaption | The caption of the action to cancel the choice. |
 | onConfirm | Call this function when a choice is selected. |
 | onCancel | Call this function when the choice is cancelled. |
@@ -172,6 +173,7 @@ To show a choice to the user, use the `choose` function. It takes one options pa
 | --- | --- | --- |
 | title | no | The title of the choice. |
 | options | yes | The possible choices. |
+| type | no | The optional type of the options to distinguish when rendering. |
 | cancelCaption | no | The caption of the cancel action. If not provided the `cancel` property of `strings` is used. The default is "Cancel". |
 
 This function returns a `Promise`. It will be resolved with the selected option and rejected if the choice is cancelled.

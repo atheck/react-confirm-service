@@ -41,6 +41,11 @@ interface ChooseOptions<TData extends Option = Option> {
      */
     options: TData [],
     /**
+     * The optional type of the options to distinguish when rendering.
+     * @type {string}
+     */
+    type?: string,
+    /**
      * The optional caption of the cancel action.
      */
     cancelCaption?: string,

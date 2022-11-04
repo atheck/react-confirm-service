@@ -117,6 +117,7 @@ describe("Service", () => {
             const chooseOptions: ChooseOptions = {
                 title: "Title",
                 options,
+                type: "default",
             };
 
             // act

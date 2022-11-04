@@ -20,6 +20,7 @@ interface State {
         isOpen: boolean,
         title: string | undefined,
         options: Service.Option [],
+        type?: string,
         cancelCaption: string,
         callback: (result: Service.Option | null) => void,
     },
@@ -97,6 +98,7 @@ class ConfirmComponentHost extends React.Component<Props, State> {
                 isOpen: false,
                 title: undefined,
                 options: [],
+                type: undefined,
                 cancelCaption: "",
                 callback () {
                     // blank
@@ -217,6 +219,7 @@ class ConfirmComponentHost extends React.Component<Props, State> {
                 isOpen: true,
                 title: props.title,
                 options: props.options,
+                type: props.type,
                 cancelCaption: props.cancelCaption ?? strings?.cancel ?? "Cancel",
                 callback,
             },
