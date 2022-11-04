@@ -48,6 +48,7 @@ interface ChoiceRenderProps {
     isOpen: boolean,
     title?: string,
     options: Service.Option [],
+    type?: string,
     cancelCaption: string,
     onConfirm: (option: Service.Option) => void,
     onCancel: () => void,
