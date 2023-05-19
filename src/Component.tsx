@@ -69,8 +69,8 @@ interface Props {
 }
 
 const defaultDurations: AlertDurations = {
-    info: 3_000,
-    success: 3_000,
+    info: 3000,
+    success: 3000,
     warning: 10_000,
     error: 10_000,
 };
