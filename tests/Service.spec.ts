@@ -1,16 +1,21 @@
-import { ChooseOptions, ConfirmOptions, ConfirmService, initAlerts, Option } from "../src/Service";
+import { addHandlers, ChooseOptions, ConfirmOptions, ConfirmService, Handlers, Option, removeHandlers } from "../src/Service";
 
 describe("Service", () => {
     const mockAlert = jest.fn();
     const mockConfirm = jest.fn();
     const mockChoose = jest.fn();
+    const alert: Handlers = {
+        alert: mockAlert,
+        confirm: mockConfirm,
+        choose: mockChoose,
+    };
 
     beforeEach(() => {
         mockAlert.mockReset();
         mockConfirm.mockReset();
         mockChoose.mockReset();
 
-        initAlerts(mockAlert, mockConfirm, mockChoose);
+        addHandlers(alert);
     });
 
     describe("alert", () => {
@@ -22,13 +27,13 @@ describe("Service", () => {
             ConfirmService.alert(message, severity);
 
             // assert
-            expect(mockAlert).toHaveBeenCalledTimes(1);
+            expect(alert.alert).toHaveBeenCalledTimes(1);
             expect(mockAlert).toHaveBeenCalledWith(message, severity);
         });
 
         it("throws if not initialized", () => {
             // arrange
-            initAlerts(null, mockConfirm, mockChoose);
+            removeHandlers(alert);
 
             // act
             const fails = (): void => ConfirmService.alert("Message", "info");
@@ -82,7 +87,7 @@ describe("Service", () => {
 
         it("throws if not initialized", async () => {
             // arrange
-            initAlerts(mockAlert, null, mockChoose);
+            removeHandlers(alert);
 
             // act
             const fails = async (): Promise<void> => ConfirmService.confirm({
@@ -149,7 +154,7 @@ describe("Service", () => {
 
         it("throws if not initialized", async () => {
             // arrange
-            initAlerts(mockAlert, mockConfirm, null);
+            removeHandlers(alert);
 
             // act
             const fails = async (): Promise<Option> => ConfirmService.choose({

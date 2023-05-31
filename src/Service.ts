@@ -51,14 +51,29 @@ interface ChooseOptions<TData extends Option = Option> {
     cancelCaption?: string,
 }
 
-let globalAlert: AlertFunc | null;
-let globalConfirm: ConfirmFunc | null;
-let globalChoose: ChooseFunc | null;
+interface Handlers {
+    alert: AlertFunc,
+    confirm: ConfirmFunc,
+    choose: ChooseFunc,
+}
 
-function initAlerts (alert: AlertFunc | null, confirm: ConfirmFunc | null, choose: ChooseFunc | null): void {
-    globalAlert = alert;
-    globalConfirm = confirm;
-    globalChoose = choose;
+const globalHandlers: Handlers [] = [];
+
+function addHandlers (handlers: Handlers): void {
+    removeHandlers(handlers);
+    globalHandlers.push(handlers);
+}
+
+function removeHandlers (handlers: Handlers): void {
+    const index = globalHandlers.indexOf(handlers);
+
+    if (index >= 0) {
+        globalHandlers.splice(index, 1);
+    }
+}
+
+function getCurrentHandlers (): Handlers | undefined {
+    return globalHandlers.at(-1);
 }
 
 const ConfirmService = {
@@ -68,11 +83,13 @@ const ConfirmService = {
      * @param severity The severity of the alert.
      */
     alert (this: void, message: string, severity: AlertSeverity): void {
-        if (globalAlert) {
-            globalAlert(message, severity);
-        } else {
+        const handlers = getCurrentHandlers();
+
+        if (!handlers) {
             throw new Error("ConfirmService is not initialized.");
         }
+
+        handlers.alert(message, severity);
     },
     /**
      * Shows a confirmation.
@@ -80,17 +97,21 @@ const ConfirmService = {
      */
     async confirm (this: void, options: ConfirmOptions): Promise<void> {
         return new Promise((resolve, reject) => {
-            if (globalConfirm) {
-                globalConfirm(options, result => {
-                    if (result) {
-                        resolve();
-                    } else {
-                        reject(new Error("Canceled"));
-                    }
-                });
-            } else {
+            const handlers = getCurrentHandlers();
+
+            if (!handlers) {
                 reject(new Error("ConfirmService is not initialized."));
+
+                return;
             }
+
+            handlers.confirm(options, result => {
+                if (result) {
+                    resolve();
+                } else {
+                    reject(new Error("Canceled"));
+                }
+            });
         });
     },
 
@@ -101,29 +122,35 @@ const ConfirmService = {
      */
     async choose<TData extends Option> (this: void, options: ChooseOptions<TData>): Promise<TData> {
         return new Promise<TData>((resolve, reject) => {
-            if (globalChoose) {
-                globalChoose(options as ChooseOptions, result => {
-                    if (result) {
-                        resolve(result as TData);
-                    } else {
-                        reject(new Error("Canceled"));
-                    }
-                });
-            } else {
+            const handlers = getCurrentHandlers();
+
+            if (!handlers) {
                 reject(new Error("ConfirmService is not initialized."));
+
+                return;
             }
+
+            handlers.choose(options as ChooseOptions, result => {
+                if (result) {
+                    resolve(result as TData);
+                } else {
+                    reject(new Error("Canceled"));
+                }
+            });
         });
     },
 };
 
 export type {
     AlertSeverity,
+    Handlers,
     ConfirmOptions,
     Option,
     ChooseOptions,
 };
 
 export {
-    initAlerts,
+    addHandlers,
+    removeHandlers,
     ConfirmService,
 };

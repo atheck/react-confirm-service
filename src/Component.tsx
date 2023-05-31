@@ -76,6 +76,8 @@ const defaultDurations: AlertDurations = {
 };
 
 class ConfirmComponentHost extends React.Component<Props, State> {
+    private readonly alert: Service.Handlers;
+
     public constructor (props: Props) {
         super(props);
 
@@ -106,15 +108,20 @@ class ConfirmComponentHost extends React.Component<Props, State> {
                 },
             },
         };
+
+        this.alert = {
+            alert: this.showAlert,
+            confirm: this.showConfirm,
+            choose: this.showChoice,
+        };
     }
 
     public override componentDidMount (): void {
-        Service.initAlerts(this.showAlert, this.showConfirm, this.showChoice);
+        Service.addHandlers(this.alert);
     }
 
-    // eslint-disable-next-line class-methods-use-this
     public override componentWillUnmount (): void {
-        Service.initAlerts(null, null, null);
+        Service.removeHandlers(this.alert);
     }
 
     public override render (): React.ReactNode {

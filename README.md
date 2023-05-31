@@ -24,7 +24,6 @@ import { ConfirmComponentHost } from "react-confirm-service";
             <Notification
                 isOpen={props.isVisible}
                 onClose={props.onClose}
-                ...
             >
                 {props.message}
             </Notification>
@@ -34,24 +33,33 @@ import { ConfirmComponentHost } from "react-confirm-service";
                 isOpen={props.isOpen}
                 title={props.title}
             >
-                // render content, buttons, ...
+                {/* render content, buttons, ... */}
             </Dialog>
         )}
         renderChoice={props => {
-            const options = props.options.map(option => <li key={option.key} onClick={() => props.onConfirm(option)}>{option.key}</li>);
+            const options = props.options.map(option => (
+                <li
+                    key={option.key}
+                    onClick={() => props.onConfirm(option)}
+                >
+                    {option.key}
+                </li>
+            ));
 
-            <Dialog
-                isOpen={props.isOpen}
-                title={props.title}
-            >
-                <>
-                    <ul>
-                        {options}
-                    </ul>
-                    <button onClick={props.onCancel}>Cancel</button>
-                </>
-            </Dialog>
-        )}
+            return (
+                <Dialog
+                    isOpen={props.isOpen}
+                    title={props.title}
+                >
+                    <>
+                        <ul>
+                            {options}
+                        </ul>
+                        <button onClick={props.onCancel}>Cancel</button>
+                    </>
+                </Dialog>
+            );
+        }}
     />
 </MyApp>
 ~~~
@@ -100,6 +108,8 @@ The `ConfirmComponentHost` accepts the following props:
 | renderChoice | no | Provide a function which renders the choice component. See [renderChoice](#renderchoice) |
 | strings | no | Takes an object to provide default values for `yes`, `no`, and `cancel` button captions. Use this to localize these texts. |
 | alertDurations | no | You can provide an object to set the durations of an alert for each severity in ms. The defaults are: info: 3000, success: 3000, warning: 10000, error: 10000. |
+
+You can use the `ConfirmComponentHost` in multiple places in your application. The `ConfirmService` will use the last one which was mounted.
 
 ### renderAlert
 
