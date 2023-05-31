@@ -6,7 +6,7 @@ interface State {
         isOpen: boolean,
         severity: Service.AlertSeverity,
         message: string,
-
+        duration?: number,
     },
     confirm: {
         isOpen: boolean,
@@ -127,7 +127,7 @@ class ConfirmComponentHost extends React.Component<Props, State> {
     public override render (): React.ReactNode {
         const { alert, confirm, choice } = this.state;
         const { renderAlert, renderConfirm, renderChoice, alertDurations } = this.props;
-        const autoHideDuration = alertDurations?.[alert.severity] ?? defaultDurations[alert.severity];
+        const autoHideDuration = alert.duration ?? alertDurations?.[alert.severity] ?? defaultDurations[alert.severity];
 
         return (
             <Fragment>
@@ -154,19 +154,20 @@ class ConfirmComponentHost extends React.Component<Props, State> {
         );
     }
 
-    private readonly showAlert = (message: string, severity: Service.AlertSeverity): void => {
+    private readonly showAlert = (message: string, severityOrOptions: Service.AlertSeverity | Service.AlertOptions): void => {
         const { alert } = this.state;
 
         if (alert.isOpen) {
             this.hideAlert();
 
-            setTimeout(() => this.showAlert(message, severity), 10);
+            setTimeout(() => this.showAlert(message, severityOrOptions), 10);
         } else {
             this.setState({
                 alert: {
                     isOpen: true,
                     message,
-                    severity,
+                    severity: typeof severityOrOptions === "string" ? severityOrOptions : severityOrOptions.severity,
+                    duration: typeof severityOrOptions === "string" ? undefined : severityOrOptions.duration,
                 },
             });
         }

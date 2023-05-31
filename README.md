@@ -160,7 +160,7 @@ To show an alert to the user, call the `alert` function. It has the following pa
 | Parameter | Required | Description |
 | --- | --- | --- |
 | message | yes | The message to display. |
-| severity | yes | The severity of the alert. |
+| severityOrOptions | yes | The severity of the alert or an options object. |
 
 ### Confirm
 

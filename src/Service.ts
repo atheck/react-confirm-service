@@ -1,7 +1,18 @@
 type AlertSeverity = "error" | "warning" | "info" | "success";
-type AlertFunc = (message: string, severity: AlertSeverity) => void;
+type AlertFunc = (message: string, severityOrOptions: AlertSeverity | AlertOptions) => void;
 type ConfirmFunc = (options: ConfirmOptions, callback: (result: boolean) => void) => void;
 type ChooseFunc = (props: ChooseOptions, callback: (result: Option | null) => void) => void;
+
+interface AlertOptions {
+    /**
+     * The severity of the alert.
+     */
+    severity: AlertSeverity,
+    /**
+     * The duration of the alert in milliseconds.
+     */
+    duration?: number,
+}
 
 interface ConfirmOptions {
     /**
@@ -80,16 +91,16 @@ const ConfirmService = {
     /**
      * Shows an alert.
      * @param message The message of the alert.
-     * @param severity The severity of the alert.
+     * @param severityOrOptions The severity of the alert or an options object.
      */
-    alert (this: void, message: string, severity: AlertSeverity): void {
+    alert (this: void, message: string, severityOrOptions: AlertSeverity | AlertOptions): void {
         const handlers = getCurrentHandlers();
 
         if (!handlers) {
             throw new Error("ConfirmService is not initialized.");
         }
 
-        handlers.alert(message, severity);
+        handlers.alert(message, severityOrOptions);
     },
     /**
      * Shows a confirmation.
@@ -144,6 +155,7 @@ const ConfirmService = {
 export type {
     AlertSeverity,
     Handlers,
+    AlertOptions,
     ConfirmOptions,
     Option,
     ChooseOptions,

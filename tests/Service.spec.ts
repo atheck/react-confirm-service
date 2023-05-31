@@ -1,4 +1,4 @@
-import { addHandlers, ChooseOptions, ConfirmOptions, ConfirmService, Handlers, Option, removeHandlers } from "../src/Service";
+import { addHandlers, AlertOptions, ChooseOptions, ConfirmOptions, ConfirmService, Handlers, Option, removeHandlers } from "../src/Service";
 
 describe("Service", () => {
     const mockAlert = jest.fn();
@@ -19,7 +19,8 @@ describe("Service", () => {
     });
 
     describe("alert", () => {
-        it("calls the provided alert function", () => {
+        it("calls the provided alert function with a severity", () => {
+            // arrange
             const message = "Message";
             const severity = "error";
 
@@ -29,6 +30,22 @@ describe("Service", () => {
             // assert
             expect(alert.alert).toHaveBeenCalledTimes(1);
             expect(mockAlert).toHaveBeenCalledWith(message, severity);
+        });
+
+        it("calls the provided alert function with an options object", () => {
+            // arrange
+            const message = "Message";
+            const options: AlertOptions = {
+                severity: "error",
+                duration: 1000,
+            };
+
+            // act
+            ConfirmService.alert(message, options);
+
+            // assert
+            expect(alert.alert).toHaveBeenCalledTimes(1);
+            expect(mockAlert).toHaveBeenCalledWith(message, options);
         });
 
         it("throws if not initialized", () => {
