@@ -20,8 +20,9 @@ interface State {
         isOpen: boolean,
         title: string | undefined,
         options: Service.Option [],
-        type?: string,
+        type: string | undefined,
         cancelCaption: string,
+        extra: unknown,
         callback: (result: Service.Option | null) => void,
     },
 }
@@ -50,6 +51,7 @@ interface ChoiceRenderProps {
     options: Service.Option [],
     type?: string,
     cancelCaption: string,
+    extra: unknown,
     onConfirm: (option: Service.Option) => void,
     onCancel: () => void,
 }
@@ -103,6 +105,7 @@ class ConfirmComponentHost extends React.Component<Props, State> {
                 options: [],
                 type: undefined,
                 cancelCaption: "",
+                extra: undefined,
                 callback () {
                     // blank
                 },
@@ -229,6 +232,7 @@ class ConfirmComponentHost extends React.Component<Props, State> {
                 title: props.title,
                 options: props.options,
                 type: props.type,
+                extra: props.extra,
                 cancelCaption: props.cancelCaption ?? strings?.cancel ?? "Cancel",
                 callback,
             },

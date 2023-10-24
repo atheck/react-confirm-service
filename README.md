@@ -150,6 +150,7 @@ You can use the `ConfirmComponentHost` in multiple places in your application. T
 | cancelCaption | The caption of the action to cancel the choice. |
 | onConfirm | Call this function when a choice is selected. |
 | onCancel | Call this function when the choice is cancelled. |
+| extra | Optional custom data. |
 
 ## How to use the `ConfirmService`
 
@@ -185,6 +186,7 @@ To show a choice to the user, use the `choose` function. It takes one options pa
 | options | yes | The possible choices. |
 | type | no | The optional type of the options to distinguish when rendering. |
 | cancelCaption | no | The caption of the cancel action. If not provided the `cancel` property of `strings` is used. The default is "Cancel". |
+| extra | no | Optional custom data. |
 
 This function returns a `Promise`. It will be resolved with the selected option and rejected if the choice is cancelled.
 

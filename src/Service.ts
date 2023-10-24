@@ -60,6 +60,10 @@ interface ChooseOptions<TData extends Option = Option> {
      * The optional caption of the cancel action.
      */
     cancelCaption?: string,
+    /**
+     * Optional custom data.
+     */
+    extra?: unknown,
 }
 
 interface Handlers {
