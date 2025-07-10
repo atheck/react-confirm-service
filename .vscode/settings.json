@@ -1,4 +1,12 @@
 {
-    "editor.formatOnSave": false,
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit",
+		"source.removeUnusedImports": "explicit",
+		"source.organizeImports.biome": "explicit"
+	},
+	"[javascript][javascriptreact][typescript][typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"editor.formatOnSave": true
 }

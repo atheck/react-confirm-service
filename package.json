@@ -11,7 +11,7 @@
     "update": "npx npm-check-updates -i",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
-    "lint": "npx eslint --ext .ts,.tsx ./src",
+    "lint": "biome lint . && npx eslint ./src",
     "semantic-release": "semantic-release"
   },
   "devDependencies": {
@@ -22,6 +22,7 @@
     "@babel/preset-env": "7.28.0",
     "@babel/preset-react": "7.27.1",
     "@babel/preset-typescript": "7.27.1",
+    "@biomejs/biome": "2.1.1",
     "@types/jest": "30.0.0",
     "@types/react": "19.1.8",
     "eslint": "9.30.1",
