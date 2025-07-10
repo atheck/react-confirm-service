@@ -1,3 +1,0 @@
-{
-    "extends": ["heck/node", "heck/complexity", "heck/groupImports"]
-}

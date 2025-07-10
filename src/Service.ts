@@ -82,7 +82,7 @@ function addHandlers (handlers: Handlers): void {
 function removeHandlers (handlers: Handlers): void {
     const index = globalHandlers.indexOf(handlers);
 
-    if (index >= 0) {
+    if (index !== -1) {
         globalHandlers.splice(index, 1);
     }
 }
@@ -147,6 +147,7 @@ const ConfirmService = {
 
             handlers.choose(options as ChooseOptions, result => {
                 if (result) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We have to cast this
                     resolve(result as TData);
                 } else {
                     reject(new Error("Canceled"));
