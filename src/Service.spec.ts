@@ -7,7 +7,7 @@ import {
 	type Handlers,
 	type Option,
 	removeHandlers,
-} from "../src/Service";
+} from "./Service";
 
 describe("Service", () => {
 	const mockAlert = jest.fn();
