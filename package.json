@@ -43,7 +43,7 @@
   "homepage": "https://github.com/atheck/react-confirm-service",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atheck/react-confirm-service.git"
+    "url": "git+https://github.com/atheck/react-confirm-service.git"
   },
   "keywords": [
     "react",
@@ -54,6 +54,9 @@
   "publishConfig": {
     "provenance": true
   },
+  "files": [
+    "dist"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts"
 }
