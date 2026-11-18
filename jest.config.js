@@ -3,6 +3,6 @@
 // biome-ignore lint/style/noCommonJs: Config file
 module.exports = {
 	preset: "ts-jest",
-	testEnvironment: "node",
+	testEnvironment: "jsdom",
 	collectCoverageFrom: ["src/**/*.{ts,tsx}"],
 };

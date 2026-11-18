@@ -24,6 +24,10 @@
 			}
 		}
 	],
+	"javascript": {
+		// Matches tsconfig "jsx": "react" (classic runtime, React must be in scope).
+		"jsxRuntime": "reactClassic"
+	},
 	"formatter": {
 		"enabled": true,
 		"lineWidth": 130

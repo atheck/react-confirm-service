@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
 	type AlertOptions,
 	type AlertSeverity,
@@ -10,30 +10,30 @@ import {
 	removeHandlers,
 } from "./Service";
 
-interface State {
-	alert: {
-		isOpen: boolean;
-		severity: AlertSeverity;
-		message: string;
-		duration?: number;
-	};
-	confirm: {
-		isOpen: boolean;
-		title: string | undefined;
-		message: string;
-		yesCaption: string;
-		noCaption: string;
-		callback: (result: boolean) => void;
-	};
-	choice: {
-		isOpen: boolean;
-		title: string | undefined;
-		options: Option[];
-		type: string | undefined;
-		cancelCaption: string;
-		extra: unknown;
-		callback: (result: Option | null) => void;
-	};
+interface AlertState {
+	isOpen: boolean;
+	severity: AlertSeverity;
+	message: string;
+	duration?: number;
+}
+
+interface ConfirmState {
+	isOpen: boolean;
+	title: string | undefined;
+	message: string;
+	yesCaption: string;
+	noCaption: string;
+	callback: (result: boolean) => void;
+}
+
+interface ChoiceState {
+	isOpen: boolean;
+	title: string | undefined;
+	options: Option[];
+	type: string | undefined;
+	cancelCaption: string;
+	extra: unknown;
+	callback: (result: Option | null) => void;
 }
 
 interface AlertRenderProps {
@@ -79,6 +79,13 @@ interface Props {
 	alertDurations?: Partial<AlertDurations>;
 }
 
+type Strings = Props["strings"];
+
+interface HostPart<TRenderProps, TShow> {
+	renderProps: TRenderProps;
+	show: TShow;
+}
+
 const defaultDurations: AlertDurations = {
 	info: 3000,
 	success: 3000,
@@ -86,195 +93,235 @@ const defaultDurations: AlertDurations = {
 	error: 10_000,
 };
 
-// biome-ignore lint/style/useReactFunctionComponents: Refactor. Maybe later.
-class ConfirmComponentHost extends React.Component<Props, State> {
-	private readonly alert: Handlers;
+function noop(): void {
+	// blank
+}
 
-	private readonly showAlert = (message: string, severityOrOptions: AlertSeverity | AlertOptions): void => {
-		const { alert } = this.state;
+const initialAlert: AlertState = {
+	isOpen: false,
+	severity: "info",
+	message: "",
+};
 
-		if (alert.isOpen) {
-			this.hideAlert();
+const initialConfirm: ConfirmState = {
+	isOpen: false,
+	title: undefined,
+	message: "",
+	yesCaption: "",
+	noCaption: "",
+	callback: noop,
+};
 
-			setTimeout(() => this.showAlert(message, severityOrOptions), 10);
-		} else {
-			this.setState({
-				alert: {
-					isOpen: true,
-					message,
-					severity: typeof severityOrOptions === "string" ? severityOrOptions : severityOrOptions.severity,
-					duration: typeof severityOrOptions === "string" ? undefined : severityOrOptions.duration,
-				},
-			});
-		}
+const initialChoice: ChoiceState = {
+	isOpen: false,
+	title: undefined,
+	options: [],
+	type: undefined,
+	cancelCaption: "",
+	extra: undefined,
+	callback: noop,
+};
+
+function createAlertState(message: string, severityOrOptions: AlertSeverity | AlertOptions): AlertState {
+	return {
+		isOpen: true,
+		message,
+		severity: typeof severityOrOptions === "string" ? severityOrOptions : severityOrOptions.severity,
+		duration: typeof severityOrOptions === "string" ? undefined : severityOrOptions.duration,
 	};
+}
 
-	private readonly showConfirm = ({ title, message, yes, no }: ConfirmOptions, callback: (result: boolean) => void): void => {
-		const { strings } = this.props;
-
-		this.setState({
-			confirm: {
-				isOpen: true,
-				title,
-				message,
-				yesCaption: yes ?? strings?.yes ?? "Yes",
-				noCaption: no === undefined ? (strings?.no ?? "No") : (no ?? ""),
-				callback,
-			},
-		});
+function createConfirmState(
+	{ title, message, yes, no }: ConfirmOptions,
+	callback: (result: boolean) => void,
+	strings: Strings,
+): ConfirmState {
+	return {
+		isOpen: true,
+		title,
+		message,
+		yesCaption: yes ?? strings?.yes ?? "Yes",
+		noCaption: no === undefined ? (strings?.no ?? "No") : (no ?? ""),
+		callback,
 	};
+}
 
-	private readonly hideAlert = (): void => {
-		this.setState((prev) => ({
-			alert: {
-				...prev.alert,
-				isOpen: false,
-			},
-		}));
+function createChoiceState(options: ChooseOptions, callback: (result: Option | null) => void, strings: Strings): ChoiceState {
+	return {
+		isOpen: true,
+		title: options.title,
+		options: options.options,
+		type: options.type,
+		extra: options.extra,
+		cancelCaption: options.cancelCaption ?? strings?.cancel ?? "Cancel",
+		callback,
 	};
+}
 
-	private readonly acceptConfirm = (): void => {
-		const { confirm } = this.state;
+/**
+ * Returns a ref which holds the value of the latest committed render.
+ * Used by the handlers, which are created once but must see current props and state.
+ */
+function useLatest<TValue>(value: TValue): React.RefObject<TValue> {
+	const ref = useRef(value);
 
-		confirm.callback(true);
-		this.closeConfirmation();
-	};
+	useEffect(() => {
+		ref.current = value;
+	});
 
-	private readonly denyConfirm = (): void => {
-		const { confirm } = this.state;
+	return ref;
+}
 
-		confirm.callback(false);
-		this.closeConfirmation();
-	};
+/**
+ * Returns a function to schedule timeouts which are cleared when the component unmounts.
+ */
+function useTimeouts(): (callback: () => void, delay: number) => void {
+	const timersRef = useRef(new Map<symbol, ReturnType<typeof setTimeout>>());
 
-	private readonly closeConfirmation = (): void => {
-		this.setState((prev) => ({
-			confirm: {
-				...prev.confirm,
-				isOpen: false,
-			},
-		}));
-	};
+	useEffect(() => {
+		const timers = timersRef.current;
 
-	private readonly showChoice = (props: ChooseOptions, callback: (option: Option | null) => void): void => {
-		const { strings } = this.props;
+		return () => {
+			for (const timer of timers.values()) {
+				clearTimeout(timer);
+			}
 
-		this.setState({
-			choice: {
-				isOpen: true,
-				title: props.title,
-				options: props.options,
-				type: props.type,
-				extra: props.extra,
-				cancelCaption: props.cancelCaption ?? strings?.cancel ?? "Cancel",
-				callback,
-			},
-		});
-	};
-
-	private readonly confirmChoice = (option: Option): void => {
-		const { choice } = this.state;
-
-		choice.callback(option);
-
-		this.setState((prev) => ({
-			choice: {
-				...prev.choice,
-				isOpen: false,
-			},
-		}));
-	};
-
-	private readonly cancelChoice = (): void => {
-		const { choice } = this.state;
-
-		choice.callback(null);
-
-		this.setState((prev) => ({
-			choice: {
-				...prev.choice,
-				isOpen: false,
-			},
-		}));
-	};
-
-	// biome-ignore lint/complexity/noExcessiveLinesPerFunction: Yes, we need to refactor this.
-	public constructor(props: Props) {
-		super(props);
-
-		this.state = {
-			alert: {
-				isOpen: false,
-				severity: "info",
-				message: "",
-			},
-			confirm: {
-				isOpen: false,
-				title: undefined,
-				message: "",
-				yesCaption: "",
-				noCaption: "",
-				callback() {
-					// blank
-				},
-			},
-			choice: {
-				isOpen: false,
-				title: undefined,
-				options: [],
-				type: undefined,
-				cancelCaption: "",
-				extra: undefined,
-				callback() {
-					// blank
-				},
-			},
+			timers.clear();
 		};
+	}, []);
 
-		this.alert = {
-			alert: this.showAlert,
-			confirm: this.showConfirm,
-			choose: this.showChoice,
-		};
-	}
+	return useCallback((callback: () => void, delay: number): void => {
+		const timers = timersRef.current;
+		const id = Symbol("timeout");
 
-	public override componentDidMount(): void {
-		addHandlers(this.alert);
-	}
-
-	public override componentWillUnmount(): void {
-		removeHandlers(this.alert);
-	}
-
-	public override render(): React.ReactNode {
-		const { alert, confirm, choice } = this.state;
-		const { renderAlert, renderConfirm, renderChoice, alertDurations } = this.props;
-		const autoHideDuration = alert.duration ?? alertDurations?.[alert.severity] ?? defaultDurations[alert.severity];
-
-		return (
-			<>
-				{renderAlert({
-					isVisible: alert.isOpen,
-					onClose: this.hideAlert,
-					duration: autoHideDuration,
-					severity: alert.severity,
-					message: alert.message,
-				})}
-				{renderConfirm({
-					...confirm,
-					confirmCaption: confirm.yesCaption,
-					onConfirm: this.acceptConfirm,
-					denyCaption: confirm.noCaption,
-					onDeny: this.denyConfirm,
-				})}
-				{renderChoice?.({
-					...choice,
-					onConfirm: this.confirmChoice,
-					onCancel: this.cancelChoice,
-				})}
-			</>
+		timers.set(
+			id,
+			setTimeout(() => {
+				timers.delete(id);
+				callback();
+			}, delay),
 		);
-	}
+	}, []);
+}
+
+function useAlert(alertDurations: Partial<AlertDurations> | undefined): HostPart<AlertRenderProps, Handlers["alert"]> {
+	const [alert, setAlert] = useState(initialAlert);
+	const isOpenRef = useLatest(alert.isOpen);
+	const setTimeoutUntilUnmount = useTimeouts();
+
+	const hideAlert = useCallback((): void => setAlert((prev) => ({ ...prev, isOpen: false })), []);
+
+	const showAlert = useCallback(
+		function show(message: string, severityOrOptions: AlertSeverity | AlertOptions): void {
+			if (isOpenRef.current) {
+				hideAlert();
+				setTimeoutUntilUnmount(() => show(message, severityOrOptions), 10);
+			} else {
+				setAlert(createAlertState(message, severityOrOptions));
+			}
+		},
+		[isOpenRef, hideAlert, setTimeoutUntilUnmount],
+	);
+
+	return {
+		renderProps: {
+			isVisible: alert.isOpen,
+			onClose: hideAlert,
+			duration: alert.duration ?? alertDurations?.[alert.severity] ?? defaultDurations[alert.severity],
+			severity: alert.severity,
+			message: alert.message,
+		},
+		show: showAlert,
+	};
+}
+
+/**
+ * State of a dialog which reports a result through a callback.
+ * Returns the current state, a setter and a function which reports the result and closes the dialog.
+ */
+function useDialog<TState extends { isOpen: boolean; callback: (result: TResult) => void }, TResult>(
+	initialState: TState,
+): [TState, (state: TState) => void, (result: TResult) => void] {
+	const [state, setState] = useState(initialState);
+
+	const close = (result: TResult): void => {
+		state.callback(result);
+		setState((prev) => ({ ...prev, isOpen: false }));
+	};
+
+	return [state, setState, close];
+}
+
+function useConfirm(stringsRef: React.RefObject<Strings>): HostPart<ConfirmRenderProps, Handlers["confirm"]> {
+	const [confirm, setConfirm, close] = useDialog<ConfirmState, boolean>(initialConfirm);
+
+	const showConfirm = useCallback(
+		(options: ConfirmOptions, callback: (result: boolean) => void): void =>
+			setConfirm(createConfirmState(options, callback, stringsRef.current)),
+		[setConfirm, stringsRef],
+	);
+
+	return {
+		renderProps: {
+			...confirm,
+			confirmCaption: confirm.yesCaption,
+			onConfirm: () => close(true),
+			denyCaption: confirm.noCaption,
+			onDeny: () => close(false),
+		},
+		show: showConfirm,
+	};
+}
+
+function useChoice(stringsRef: React.RefObject<Strings>): HostPart<ChoiceRenderProps, Handlers["choose"]> {
+	const [choice, setChoice, close] = useDialog<ChoiceState, Option | null>(initialChoice);
+
+	const showChoice = useCallback(
+		(options: ChooseOptions, callback: (result: Option | null) => void): void =>
+			setChoice(createChoiceState(options, callback, stringsRef.current)),
+		[setChoice, stringsRef],
+	);
+
+	return {
+		renderProps: {
+			...choice,
+			onConfirm: (option: Option) => close(option),
+			onCancel: () => close(null),
+		},
+		show: showChoice,
+	};
+}
+
+/**
+ * Registers the handlers at the service while the component is mounted.
+ * The service identifies a host by the handlers object, so it is created only once and keeps its identity.
+ * This is safe because the handlers only access refs and state setters.
+ */
+function useRegisterHandlers(alert: Handlers["alert"], confirm: Handlers["confirm"], choose: Handlers["choose"]): void {
+	const [handlers] = useState<Handlers>(() => ({ alert, confirm, choose }));
+
+	useEffect(() => {
+		addHandlers(handlers);
+
+		return () => removeHandlers(handlers);
+	}, [handlers]);
+}
+
+function ConfirmComponentHost({ renderAlert, renderConfirm, renderChoice, strings, alertDurations }: Props): React.ReactNode {
+	const stringsRef = useLatest(strings);
+	const alert = useAlert(alertDurations);
+	const confirm = useConfirm(stringsRef);
+	const choice = useChoice(stringsRef);
+
+	useRegisterHandlers(alert.show, confirm.show, choice.show);
+
+	return (
+		<>
+			{renderAlert(alert.renderProps)}
+			{renderConfirm(confirm.renderProps)}
+			{renderChoice?.(choice.renderProps)}
+		</>
+	);
 }
 
 export type { AlertRenderProps, ChoiceRenderProps, ConfirmRenderProps, Props };
