@@ -76,7 +76,7 @@ interface Props {
 		no?: string;
 		cancel?: string;
 	};
-	alertDurations?: AlertDurations;
+	alertDurations?: Partial<AlertDurations>;
 }
 
 const defaultDurations: AlertDurations = {
