@@ -47,6 +47,9 @@
     "confirm",
     "service"
   ],
+  "publishConfig": {
+    "provenance": true
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts"
 }
