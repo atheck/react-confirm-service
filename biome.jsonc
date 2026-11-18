@@ -1,6 +1,6 @@
 {
 	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-	"extends": ["eslint-config-heck/biomeJsTs"],
+	"extends": ["eslint-config-heck/biomeJsTs", "eslint-config-heck/biomeComplexity"],
 	"linter": {
 		"rules": {
 			"performance": {
@@ -14,6 +14,9 @@
 			"includes": ["**/*.spec.ts", "**/*.spec.tsx", "**/test/**/*.ts", "**/test/**/*.tsx"],
 			"linter": {
 				"rules": {
+					"complexity": {
+						"noExcessiveNestedCallbacks": "off"
+					},
 					"style": {
 						"noNonNullAssertion": "off"
 					}

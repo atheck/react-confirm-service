@@ -107,7 +107,7 @@ describe("Service", () => {
 			const fails = async (): Promise<void> => ConfirmService.confirm(options);
 
 			// assert
-			await expect(fails).rejects.toThrow("Canceled");
+			await expect(fails()).rejects.toThrow("Canceled");
 			expect(mockConfirm).toHaveBeenCalledWith(options, expect.any(Function));
 		});
 
@@ -122,7 +122,7 @@ describe("Service", () => {
 				});
 
 			// assert
-			await expect(fails).rejects.toThrow("ConfirmService is not initialized.");
+			await expect(fails()).rejects.toThrow("ConfirmService is not initialized.");
 		});
 	});
 
@@ -174,7 +174,7 @@ describe("Service", () => {
 			const fails = async (): Promise<Option> => ConfirmService.choose(chooseOptions);
 
 			// assert
-			await expect(fails).rejects.toThrow("Canceled");
+			await expect(fails()).rejects.toThrow("Canceled");
 			expect(mockChoose).toHaveBeenCalledWith(chooseOptions, expect.any(Function));
 		});
 
@@ -189,7 +189,7 @@ describe("Service", () => {
 				});
 
 			// assert
-			await expect(fails).rejects.toThrow("ConfirmService is not initialized.");
+			await expect(fails()).rejects.toThrow("ConfirmService is not initialized.");
 		});
 	});
 });

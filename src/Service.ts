@@ -110,6 +110,7 @@ const ConfirmService = {
 	 * Shows a confirmation.
 	 * @param options The options for the confirmation.
 	 */
+	// biome-ignore lint/suspicious/useAwait: Not required when returning a promise.
 	async confirm(this: void, options: ConfirmOptions): Promise<void> {
 		return new Promise((resolve, reject) => {
 			const handlers = getCurrentHandlers();
@@ -135,6 +136,7 @@ const ConfirmService = {
 	 * @param options The options of the choice.
 	 * @returns Resolves if a choice was selected, otherwise rejects the promise.
 	 */
+	// biome-ignore lint/suspicious/useAwait: Not required when returning a promise.
 	async choose<TData extends Option>(this: void, options: ChooseOptions<TData>): Promise<TData> {
 		return new Promise<TData>((resolve, reject) => {
 			const handlers = getCurrentHandlers();
@@ -145,9 +147,9 @@ const ConfirmService = {
 				return;
 			}
 
-			handlers.choose(options as ChooseOptions, (result) => {
+			handlers.choose(options, (result) => {
 				if (result) {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We have to cast this
+					// biome-ignore lint/nursery/noUnsafeTypeAssertion: We have to cast.
 					resolve(result as TData);
 				} else {
 					reject(new Error("Canceled"));
@@ -157,6 +159,6 @@ const ConfirmService = {
 	},
 };
 
-export type { AlertSeverity, Handlers, AlertOptions, ConfirmOptions, Option, ChooseOptions };
+export type { AlertOptions, AlertSeverity, ChooseOptions, ConfirmOptions, Handlers, Option };
 
-export { addHandlers, removeHandlers, ConfirmService };
+export { addHandlers, ConfirmService, removeHandlers };

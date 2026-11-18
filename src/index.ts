@@ -1,9 +1,10 @@
-export { type AlertRenderProps, ConfirmComponentHost, type ConfirmRenderProps } from "./Component";
-export {
-	type AlertOptions,
-	type AlertSeverity,
-	type ChooseOptions,
-	type ConfirmOptions,
-	ConfirmService,
-	type Option,
+export type { AlertRenderProps, ConfirmRenderProps } from "./Component";
+export { ConfirmComponentHost } from "./Component";
+export type {
+	AlertOptions,
+	AlertSeverity,
+	ChooseOptions,
+	ConfirmOptions,
+	Option,
 } from "./Service";
+export { ConfirmService } from "./Service";
